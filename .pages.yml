@@ -106,11 +106,12 @@ content:
       - name: visibility
         label: Visibility
         type: select
-        options:
-          - { value: public, label: Public }
-          - { value: password, label: Password Protected }
-          - { value: hidden, label: Hidden }
         default: public
+        options:
+          values:
+            - { value: public, label: Public }
+            - { value: password, label: Password Protected }
+            - { value: hidden, label: Hidden }
       - name: password
         label: Password
         type: string
