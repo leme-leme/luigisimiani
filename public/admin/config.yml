@@ -1,171 +1,105 @@
 backend:
   name: github
-  repo: leviszaboo/luigisimiani.com
-  branch: main
+  repo: leme-leme/luigisimiani
+  branch: cms/sveltia
+  base_url: https://pages.leme.work
+  auth_endpoint: /api/auth
 
-local_backend: true
+media_folder: public/images
+public_folder: /images
 
-media_folder: public/images/galleries
-public_folder: /images/galleries
-
-publish_mode: editorial_workflow
+site_url: https://luigisimiani.com
 
 collections:
-  # Galleries
-  - name: galleries
-    label: Galleries
-    folder: content/gallery
-    create: true
-    slug: "{{slug}}"
-    extension: json
-    format: json
-    sortable_fields: [title, date, category]
-    fields:
-      - name: id
-        label: ID
-        widget: string
-        pattern: ["^[a-z0-9-]+$", "Lowercase letters, numbers, and hyphens only"]
-      - name: title
-        label: Title
-        widget: string
-      - name: subTitle
-        label: Subtitle
-        widget: string
-        required: false
-      - name: date
-        label: Date
-        widget: datetime
-        date_format: "YYYY-MM-DD"
-        time_format: false
-        hint: "Used for sorting galleries"
-      - name: coverPhoto
-        label: Cover Photo
-        widget: image
-        required: false
-        hint: "Main thumbnail for gallery list"
-      - name: imageUrls
-        label: Images
-        widget: list
-        summary: "{{fields.url}}"
-        minimize_collapsed: true
-        field: { name: url, label: Image, widget: image, media_library: { allow_multiple: true } }
-      - name: category
-        label: Category
-        widget: select
-        options: ["digital", "analog", "fashion", "editorial", "event", "portrait", "product", "wedding"]
-        hint: "Primary category for this gallery"
-      - name: tags
-        label: Tags
-        widget: list
-        required: false
-        hint: "Layout: 'hero'/'featured' (full), 'editorial'/'pair' (half), 'portrait'/'small' (third). Special: 'hidden' (hides from listings), 'downloadable' (adds download ZIP button), 'protect' (disables flower bypass on password page)"
-      - name: password
-        label: Password
-        widget: string
-        required: false
-        hint: "Leave blank for public, set password to protect"
-
-  # Pages
-  - name: pages
-    label: Pages
+  - name: settings
+    label: "⚙️ Site Settings"
     files:
-      - name: homepage
-        label: Homepage
+      - name: settings
+        label: General Settings
         file: content/settings.json
+        format: json
         fields:
-          - name: heroTitle
-            label: Hero Title
-            widget: string
-            required: false
-            hint: "Optional title displayed over hero slideshow"
-          - name: featuredTitle
-            label: Featured Section Title
-            widget: string
-            default: "Featured Work"
-            hint: "Title for the featured work section"
-          - name: heroSlideshow
-            label: Hero Slideshow
-            widget: relation
-            collection: components
-            file: hero
-            value_field: galleries
-            display_fields: ["galleries"]
-            required: false
-            hint: "Reference to Hero Slideshow component"
-          - name: quotes
-            label: Quotes
-            widget: relation
-            collection: components
-            file: quotes
-            value_field: quotes
-            display_fields: ["quotes"]
-            required: false
-            hint: "Reference to Quotes component"
-      - name: about
-        label: About
+          - { name: heroTitle, label: Hero Title, widget: string, required: false }
+          - { name: featuredTitle, label: Featured Section Title, widget: string }
+
+      - name: bio
+        label: Bio
         file: content/bio.json
+        format: json
         fields:
           - name: paragraphs
             label: Paragraphs
-            label_singular: Paragraph
             widget: list
-            hint: "Bio paragraphs in display order"
             fields:
-              - name: id
-                label: ID
-                widget: string
-              - name: value
-                label: Text
-                widget: text
+              - { name: id, label: ID, widget: string }
+              - { name: value, label: Text, widget: text }
+
       - name: contact
-        label: Contact
+        label: Contact Info
         file: content/contact.json
+        format: json
         fields:
-          - name: email
-            label: Email
-            widget: string
-          - name: location
-            label: Location
-            widget: string
-          - name: instagram
-            label: Instagram Handle
-            widget: string
-            required: false
-            hint: "Without @ symbol"
-          - name: linkedin
-            label: LinkedIn URL
-            widget: string
-            required: false
-            hint: "Full LinkedIn profile URL"
-  # Components
-  - name: components
-    label: Components
-    files:
-      - name: hero
-        label: Hero Slideshow
+          - { name: email, label: Email, widget: string }
+          - { name: location, label: Location, widget: string }
+          - { name: instagram, label: Instagram Handle, widget: string }
+          - { name: linkedin, label: LinkedIn URL, widget: string }
+
+      - name: featured
+        label: Featured Work
         file: content/featured.json
+        format: json
         fields:
           - name: galleries
-            label: Hero Galleries
+            label: Featured Gallery Slugs
             widget: list
-            hint: "Select galleries for the hero slideshow. Uses cover photo from each gallery."
-            field:
-              name: galleryId
-              label: Gallery
-              widget: relation
-              collection: galleries
-              search_fields: [title, id]
-              value_field: id
-              display_fields: [title]
+            field: { name: slug, label: Slug, widget: string }
+
       - name: quotes
         label: Quotes
         file: content/quotes.json
+        format: json
         fields:
           - name: quotes
             label: Quotes
             widget: list
-            hint: "Quotes displayed between featured galleries"
             fields:
-              - { name: id, label: ID, widget: string }
               - { name: text, label: Quote Text, widget: text }
-              - { name: author, label: Author, widget: string, required: false }
+              - { name: author, label: Author, widget: string }
+
+      - name: film-strip
+        label: Film Strip
+        file: content/film-strip.json
+        format: json
+        fields:
+          - name: images
+            label: Film Strip Images
+            widget: list
+            fields:
+              - { name: url, label: Image, widget: image }
+              - { name: orientation, label: Orientation, widget: select, options: [vertical, horizontal] }
+              - { name: aspectRatio, label: Aspect Ratio, widget: number, value_type: float }
+
+  - name: gallery
+    label: "📸 Gallery Projects"
+    label_singular: Gallery Project
+    folder: content/gallery
+    format: json
+    create: true
+    slug: "{{fields.id}}"
+    identifier_field: id
+    summary: "{{title}}"
+    sortable_fields: [title, featured]
+    fields:
+      - { name: id, label: Slug / ID, widget: string }
+      - { name: title, label: Title, widget: string }
+      - { name: subTitle, label: Subtitle, widget: string, required: false }
+      - { name: featured, label: Featured, widget: boolean, default: false }
+      - { name: coverPhoto, label: Cover Photo, widget: image }
+      - name: imageUrls
+        label: Gallery Images
+        widget: list
+        field: { name: url, label: Image URL, widget: image }
+      - name: imageAspectRatios
+        label: Image Aspect Ratios
+        widget: list
+        field: { name: ratio, label: Ratio, widget: number, value_type: float }
